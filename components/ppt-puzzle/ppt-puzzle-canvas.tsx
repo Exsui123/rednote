@@ -162,7 +162,7 @@ export function PptPuzzleCanvas({ puzzleState, onStateChange }: PptPuzzleCanvasP
         puzzleState.direction,
         puzzleState.mainImages.length,
         puzzleState.subImages.length,
-        puzzleState.subRatio || 0.3  // 传递次图配比
+        puzzleState.subRatio  // 传递次图配比
       )
 
       console.log('Layout config:', layoutConfig)
@@ -176,82 +176,38 @@ export function PptPuzzleCanvas({ puzzleState, onStateChange }: PptPuzzleCanvasP
         puzzleState.subPerMain
       )
 
-      // 绘制图片的辅助函数，保持宽高比
-      const drawImageKeepAspectRatio = (
-        img: HTMLImageElement,
-        region: { x: number; y: number; width: number; height: number },
-        fit: 'contain' | 'cover' = 'contain'  // 默认改为contain，确保图片完全显示
-      ) => {
-        const imgAspect = img.width / img.height
-        const regionAspect = region.width / region.height
-        
-        let drawWidth = region.width
-        let drawHeight = region.height
-        let offsetX = 0
-        let offsetY = 0
-        
-        if (fit === 'contain') {
-          // 图片完全显示在区域内，可能有留白
-          if (imgAspect > regionAspect) {
-            // 图片更宽，按宽度适配
-            drawWidth = region.width
-            drawHeight = drawWidth / imgAspect
-            offsetY = (region.height - drawHeight) / 2
-          } else {
-            // 图片更高，按高度适配
-            drawHeight = region.height
-            drawWidth = drawHeight * imgAspect
-            offsetX = (region.width - drawWidth) / 2
-          }
-        } else {
-          // 图片填满区域，可能会裁剪
-          if (imgAspect > regionAspect) {
-            // 图片更宽，按高度适配
-            drawHeight = region.height
-            drawWidth = drawHeight * imgAspect
-            offsetX = (region.width - drawWidth) / 2
-          } else {
-            // 图片更高，按宽度适配
-            drawWidth = region.width
-            drawHeight = drawWidth / imgAspect
-            offsetY = (region.height - drawHeight) / 2
-          }
-        }
-        
-        // 绘制背景（可选，用于调试）
-        if (false) {  // 调试时可以改为true查看区域边界
-          ctx.fillStyle = 'rgba(200, 200, 200, 0.3)'
-          ctx.fillRect(region.x, region.y, region.width, region.height)
-        }
-        
-        // 绘制图片
-        ctx.drawImage(
-          img,
-          region.x + offsetX,
-          region.y + offsetY,
-          drawWidth,
-          drawHeight
-        )
-      }
-      
-      // 绘制分配后的主图
+      // 绘制分配后的主图 - 使用和导出相同的方式
       layoutConfig.mainRegions.forEach((region, index) => {
         const image = distributedMainImages[index]
         console.log(`Drawing main image ${index}:`, image?.name, !!loadedImages[image?.url || ''], 'at region:', region)
         if (image && loadedImages[image.url]) {
           const img = loadedImages[image.url]
-          drawImageKeepAspectRatio(img, region, 'contain')  // 使用contain模式
+          // 直接绘制，填满整个区域（和导出保持一致）
+          ctx.drawImage(
+            img,
+            region.x,
+            region.y,
+            region.width,
+            region.height
+          )
           console.log(`Drew main image at:`, region)
         }
       })
 
-      // 绘制分配后的次图
+      // 绘制分配后的次图 - 使用和导出相同的方式
       layoutConfig.subRegions.forEach((region, index) => {
         const image = distributedSubImages[index]
         console.log(`Drawing sub image ${index}:`, image?.name, !!loadedImages[image?.url || ''], 'at region:', region)
         if (image && loadedImages[image.url]) {
           const img = loadedImages[image.url]
-          drawImageKeepAspectRatio(img, region, 'contain')  // 使用contain模式
+          // 直接绘制，填满整个区域（和导出保持一致）
+          ctx.drawImage(
+            img,
+            region.x,
+            region.y,
+            region.width,
+            region.height
+          )
           console.log(`Drew sub image at:`, region)
         }
       })

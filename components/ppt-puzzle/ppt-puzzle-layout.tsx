@@ -6,8 +6,8 @@ import { PptPuzzleCanvas } from "./ppt-puzzle-canvas"
 import { PptPuzzleState } from "@/lib/types/ppt-puzzle"
 
 const defaultCanvasSize = {
-  width: 1200,
-  height: 800
+  width: 1242,
+  height: 1656
 }
 
 export function PptPuzzleLayout() {

@@ -195,9 +195,9 @@ export function LayoutSettingsSection({ puzzleState, onStateChange }: LayoutSett
         <Label className="text-sm font-medium">画布尺寸</Label>
         <div className="grid grid-cols-4 gap-2">
           {[
-            { width: 1200, height: 800, label: "16:9" },
+            { width: 1242, height: 1656, label: "3:4" },
             { width: 1080, height: 1080, label: "1:1" },
-            { width: 800, height: 1200, label: "4:3" }
+            { width: 1200, height: 800, label: "3:2" }
           ].map((size) => (
             <Button
               key={size.label}
@@ -217,7 +217,7 @@ export function LayoutSettingsSection({ puzzleState, onStateChange }: LayoutSett
           <Button
             variant={puzzleState.customCanvasSize ? "default" : "outline"}
             size="sm"
-            onClick={() => updateCustomCanvasSize(1200, 800)}
+            onClick={() => updateCustomCanvasSize(1242, 1656)}
             className="text-xs"
           >
             自定义
@@ -236,11 +236,11 @@ export function LayoutSettingsSection({ puzzleState, onStateChange }: LayoutSett
                     type="number"
                     min="100"
                     max="5000"
-                    placeholder="1200"
+                    placeholder="1242"
                     value={getCurrentCanvasSize().width || ''}
                     onChange={(e) => updateCustomCanvasSize(
-                      parseInt(e.target.value) || 1200,
-                      getCurrentCanvasSize().height || 800
+                      parseInt(e.target.value) || 1242,
+                      getCurrentCanvasSize().height || 1656
                     )}
                   />
                 </div>
@@ -250,11 +250,11 @@ export function LayoutSettingsSection({ puzzleState, onStateChange }: LayoutSett
                     type="number"
                     min="100"
                     max="5000"
-                    placeholder="800"
+                    placeholder="1656"
                     value={getCurrentCanvasSize().height || ''}
                     onChange={(e) => updateCustomCanvasSize(
-                      getCurrentCanvasSize().width || 1200,
-                      parseInt(e.target.value) || 800
+                      getCurrentCanvasSize().width || 1242,
+                      parseInt(e.target.value) || 1656
                     )}
                   />
                 </div>

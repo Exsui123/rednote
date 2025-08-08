@@ -30,7 +30,8 @@ export async function exportPuzzleImage(
     puzzleState.subPerMain,
     puzzleState.direction,
     puzzleState.mainImages.length,
-    puzzleState.subImages.length
+    puzzleState.subImages.length,
+    puzzleState.subRatio || 0.3  // 传递次图比例
   )
 
   // 使用与canvas相同的分配逻辑
