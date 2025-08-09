@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { PptPuzzleSidebar } from "./ppt-puzzle-sidebar"
 import { PptPuzzleCanvas } from "./ppt-puzzle-canvas"
+import { PptPuzzleImageManager } from "./ppt-puzzle-image-manager"
 import { PptPuzzleState } from "@/lib/types/ppt-puzzle"
 
 const defaultCanvasSize = {
@@ -40,6 +41,10 @@ export function PptPuzzleLayout() {
           />
         </div>
       </div>
+      <PptPuzzleImageManager
+        puzzleState={puzzleState}
+        onStateChange={setPuzzleState}
+      />
     </div>
   )
 }

@@ -75,10 +75,13 @@ export function PptPuzzleCanvas({ puzzleState, onStateChange }: PptPuzzleCanvasP
   const [canvasOffset, setCanvasOffset] = useState({ x: 0, y: 0 })
   const [loadedImages, setLoadedImages] = useState<Record<string, HTMLImageElement>>({})
 
-  // 加载所有图片
+  // 加载所有图片（包括主图和次图）
   useEffect(() => {
     const loadImages = async () => {
-      const imagePromises = puzzleState.images.map(async (imageItem) => {
+      // 合并所有图片（主图和次图）
+      const allImages = [...puzzleState.mainImages, ...puzzleState.subImages]
+      
+      const imagePromises = allImages.map(async (imageItem) => {
         return new Promise<[string, HTMLImageElement | null]>((resolve) => {
           const img = new Image()
           img.onload = () => resolve([imageItem.url, img])
@@ -102,10 +105,11 @@ export function PptPuzzleCanvas({ puzzleState, onStateChange }: PptPuzzleCanvasP
       setLoadedImages(imageMap)
     }
 
-    if (puzzleState.images.length > 0) {
+    // 当主图或次图有内容时加载
+    if (puzzleState.mainImages.length > 0 || puzzleState.subImages.length > 0) {
       loadImages()
     }
-  }, [puzzleState.images])
+  }, [puzzleState.mainImages, puzzleState.subImages])
 
   // 绘制画布内容
   useEffect(() => {
@@ -180,7 +184,8 @@ export function PptPuzzleCanvas({ puzzleState, onStateChange }: PptPuzzleCanvasP
       layoutConfig.mainRegions.forEach((region, index) => {
         const image = distributedMainImages[index]
         console.log(`Drawing main image ${index}:`, image?.name, !!loadedImages[image?.url || ''], 'at region:', region)
-        if (image && loadedImages[image.url]) {
+        // 检查 isVisible 属性，如果为 false 则不绘制
+        if (image && loadedImages[image.url] && image.isVisible !== false) {
           const img = loadedImages[image.url]
           // 直接绘制，填满整个区域（和导出保持一致）
           ctx.drawImage(
@@ -198,7 +203,8 @@ export function PptPuzzleCanvas({ puzzleState, onStateChange }: PptPuzzleCanvasP
       layoutConfig.subRegions.forEach((region, index) => {
         const image = distributedSubImages[index]
         console.log(`Drawing sub image ${index}:`, image?.name, !!loadedImages[image?.url || ''], 'at region:', region)
-        if (image && loadedImages[image.url]) {
+        // 检查 isVisible 属性，如果为 false 则不绘制
+        if (image && loadedImages[image.url] && image.isVisible !== false) {
           const img = loadedImages[image.url]
           // 直接绘制，填满整个区域（和导出保持一致）
           ctx.drawImage(
@@ -222,8 +228,8 @@ export function PptPuzzleCanvas({ puzzleState, onStateChange }: PptPuzzleCanvasP
     puzzleState.spacing,
     puzzleState.subPerMain,  // 使用subPerMain替代customLayout
     puzzleState.subRatio,  // 添加subRatio作为依赖
-    puzzleState.mainImages.length,
-    puzzleState.subImages.length,
+    puzzleState.mainImages,  // 改为整个数组，以监听 isVisible 变化
+    puzzleState.subImages,   // 改为整个数组，以监听 isVisible 变化
     puzzleState.canvasSize.width,
     puzzleState.canvasSize.height,
     puzzleState.customCanvasSize?.width,

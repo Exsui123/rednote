@@ -3,10 +3,19 @@ import { CanvasSize, ImageFile } from "./index"
 export type PuzzleLayout = "1+4" | "1+6" | "2+4" | "grid" | "custom"
 export type PuzzleDirection = "left-main" | "right-main" | "top-main" | "bottom-main"
 
+export interface ImageItem {
+  id: string
+  url: string
+  name: string
+  type?: "main" | "sub"
+  isVisible?: boolean
+}
+
 export interface PuzzleImageItem extends ImageFile {
   type: "main" | "sub"
   position?: { x: number; y: number }
   size?: { width: number; height: number }
+  isVisible?: boolean
 }
 
 export interface PptPuzzleState {
