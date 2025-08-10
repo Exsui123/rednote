@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { ImageIcon, ArrowRight, Grid3X3 } from "lucide-react"
+import { ImageIcon, ArrowRight, Grid3X3, Video } from "lucide-react"
 
 interface ToolCard {
   id: string
@@ -30,6 +30,14 @@ const tools: ToolCard[] = [
     icon: <Grid3X3 className="h-8 w-8" />,
     href: "/tools/ppt-puzzle",
     category: "图像处理"
+  },
+  {
+    id: "image-to-video",
+    title: "图片转视频",
+    description: "将多张图片合成为精美视频，支持转场效果、背景音乐和文字标题",
+    icon: <Video className="h-8 w-8" />,
+    href: "/tools/image-to-video",
+    category: "视频处理"
   },
   // 可以在这里添加更多工具
 ]
