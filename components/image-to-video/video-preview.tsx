@@ -25,7 +25,7 @@ export function VideoPreview() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const videoRef = useRef<HTMLVideoElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
-  const animationRef = useRef<number>()
+  const animationRef = useRef<number>(0)
   
   // 计算总时长
   const totalDuration = images.reduce((sum, img) => sum + img.duration, 0)

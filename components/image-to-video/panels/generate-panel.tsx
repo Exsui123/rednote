@@ -104,7 +104,7 @@ export function GeneratePanel() {
       
       // 模拟进度更新
       const progressInterval = setInterval(() => {
-        setGenerationProgress(prev => {
+        setGenerationProgress((prev: number) => {
           if (prev >= 90) {
             clearInterval(progressInterval)
             return prev

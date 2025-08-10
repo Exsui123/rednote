@@ -67,7 +67,7 @@ export async function POST(request: NextRequest) {
     const outputBuffer = await processedImage.jpeg({ quality: 90 }).toBuffer()
     
     // 返回处理后的图片
-    return new NextResponse(outputBuffer, {
+    return new NextResponse(outputBuffer as unknown as BodyInit, {
       headers: {
         'Content-Type': 'image/jpeg',
         'Cache-Control': 'no-cache'

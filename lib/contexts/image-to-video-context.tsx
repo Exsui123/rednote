@@ -69,7 +69,7 @@ interface ImageToVideoContextType {
   isGenerating: boolean
   setIsGenerating: (generating: boolean) => void
   generationProgress: number
-  setGenerationProgress: (progress: number) => void
+  setGenerationProgress: (progress: number | ((prev: number) => number)) => void
   generationStatus: string
   setGenerationStatus: (status: string) => void
   

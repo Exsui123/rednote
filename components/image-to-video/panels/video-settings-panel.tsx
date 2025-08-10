@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Slider } from '@/components/ui/slider'
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
-import { Music, Type, Settings, Palette, AspectRatio } from 'lucide-react'
+import { Music, Type, Settings, Palette, Maximize } from 'lucide-react'
 
 export function VideoSettingsPanel() {
   const { 
