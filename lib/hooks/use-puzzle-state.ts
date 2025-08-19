@@ -11,34 +11,43 @@ interface HistoryState {
 }
 
 export function usePuzzleState(initialState: PptPuzzleState) {
-  // 从localStorage加载状态
-  const loadFromStorage = (): PptPuzzleState => {
-    if (typeof window === 'undefined') return initialState
+  // 历史记录管理 - 初始化时使用initialState，避免SSR问题
+  const [history, setHistory] = useState<HistoryState>({
+    past: [],
+    present: initialState,
+    future: []
+  })
+  
+  // 标记是否已经从localStorage加载过
+  const [isHydrated, setIsHydrated] = useState(false)
+  
+  // 客户端加载localStorage数据
+  useEffect(() => {
+    if (typeof window === 'undefined') return
     
     try {
       const stored = localStorage.getItem(STORAGE_KEY)
       if (stored) {
         const parsed = JSON.parse(stored)
         // 恢复图片的URL（base64格式的会被保存）
-        return {
+        const restoredState = {
           ...parsed,
           showPuzzle: false, // 重置显示状态
           currentBatchIndex: 0, // 重置批次索引
         }
+        
+        setHistory({
+          past: [],
+          present: restoredState,
+          future: []
+        })
       }
     } catch (error) {
       console.error('Failed to load from localStorage:', error)
     }
     
-    return initialState
-  }
-
-  // 历史记录管理
-  const [history, setHistory] = useState<HistoryState>(() => ({
-    past: [],
-    present: loadFromStorage(),
-    future: []
-  }))
+    setIsHydrated(true)
+  }, [])
 
   // 保存到localStorage（防抖处理）
   const saveTimeoutRef = useRef<NodeJS.Timeout>()
@@ -183,6 +192,7 @@ export function usePuzzleState(initialState: PptPuzzleState) {
     redo,
     canUndo: history.past.length > 0,
     canRedo: history.future.length > 0,
-    clearStorage
+    clearStorage,
+    isHydrated
   }
 }
