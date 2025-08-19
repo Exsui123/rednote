@@ -135,11 +135,23 @@ export function PptPuzzleCanvas({ puzzleState, onStateChange }: PptPuzzleCanvasP
         return
       }
 
-      console.log('Drawing puzzle:', {
-        direction: puzzleState.direction,
-        mainImages: puzzleState.mainImages.length,
-        subImages: puzzleState.subImages.length,
-        loadedImages: Object.keys(loadedImages).length
+      // 计算当前批次的图片范围
+      const mainStartIdx = puzzleState.currentBatchIndex * puzzleState.mainPerPage
+      const mainEndIdx = Math.min(mainStartIdx + puzzleState.mainPerPage, puzzleState.mainImages.length)
+      const batchMainImages = puzzleState.mainImages.slice(mainStartIdx, mainEndIdx)
+      
+      // 计算对应的次图范围
+      const subStartIdx = mainStartIdx * puzzleState.subPerMain
+      const subEndIdx = Math.min(subStartIdx + (mainEndIdx - mainStartIdx) * puzzleState.subPerMain, puzzleState.subImages.length)
+      const batchSubImages = puzzleState.subImages.slice(subStartIdx, subEndIdx)
+
+      console.log('Drawing puzzle batch:', {
+        batchIndex: puzzleState.currentBatchIndex,
+        totalBatches: puzzleState.totalBatches,
+        mainImages: `${mainStartIdx}-${mainEndIdx} of ${puzzleState.mainImages.length}`,
+        subImages: `${subStartIdx}-${subEndIdx} of ${puzzleState.subImages.length}`,
+        batchMainCount: batchMainImages.length,
+        batchSubCount: batchSubImages.length
       })
 
       // 计算图片的平均宽高比
@@ -157,24 +169,24 @@ export function PptPuzzleCanvas({ puzzleState, onStateChange }: PptPuzzleCanvasP
         return count > 0 ? totalRatio / count : 1
       }
       
-      // 生成布局配置
+      // 生成布局配置 - 使用当前批次的数量
       const layoutConfig = generatePuzzleLayout(
         puzzleState.layout,
         puzzleState.customCanvasSize || puzzleState.canvasSize,
         puzzleState.spacing,
         puzzleState.subPerMain,
         puzzleState.direction,
-        puzzleState.mainImages.length,
-        puzzleState.subImages.length,
+        batchMainImages.length,  // 使用当前批次的主图数
+        batchSubImages.length,   // 使用当前批次的次图数
         puzzleState.subRatio  // 传递次图配比
       )
 
       console.log('Layout config:', layoutConfig)
 
-      // 实现均匀分配逻辑
+      // 实现均匀分配逻辑 - 使用当前批次的图片
       const { distributedMainImages, distributedSubImages } = distributeImages(
-        puzzleState.mainImages,
-        puzzleState.subImages,
+        batchMainImages,
+        batchSubImages,
         layoutConfig,
         puzzleState.layout,
         puzzleState.subPerMain
@@ -227,7 +239,10 @@ export function PptPuzzleCanvas({ puzzleState, onStateChange }: PptPuzzleCanvasP
     puzzleState.layout,
     puzzleState.spacing,
     puzzleState.subPerMain,  // 使用subPerMain替代customLayout
+    puzzleState.mainPerPage,  // 添加mainPerPage作为依赖
     puzzleState.subRatio,  // 添加subRatio作为依赖
+    puzzleState.currentBatchIndex,  // 添加当前批次索引作为依赖
+    puzzleState.totalBatches,  // 添加总批次数作为依赖
     puzzleState.mainImages,  // 改为整个数组，以监听 isVisible 变化
     puzzleState.subImages,   // 改为整个数组，以监听 isVisible 变化
     puzzleState.canvasSize.width,

@@ -19,12 +19,15 @@ export function PptPuzzleLayout() {
     layout: "custom",  // 使用custom作为默认，完全依据主次图数量和配比
     direction: "left-main",
     subPerMain: 2,  // 默认每个主图配2个次图
+    mainPerPage: 4,  // 默认每页4个主图
     subRatio: 0.3,  // 默认次图为主图的30%大小
     canvasSize: defaultCanvasSize,
     zoom: 0.8,
     spacing: 10,
     backgroundColor: "#ffffff",
-    showPuzzle: false
+    showPuzzle: false,
+    currentBatchIndex: 0,  // 当前批次索引
+    totalBatches: 1  // 总批次数
   })
 
   return (

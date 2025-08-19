@@ -25,6 +25,7 @@ export interface PptPuzzleState {
   layout: PuzzleLayout
   direction: PuzzleDirection // 布局方向
   subPerMain: number // 每个主图配几个次图
+  mainPerPage: number // 每页主图数
   subRatio: number // 次图相对于主图的缩放比例
   canvasSize: CanvasSize
   customCanvasSize?: CanvasSize // 自定义尺寸
@@ -32,6 +33,8 @@ export interface PptPuzzleState {
   spacing: number
   backgroundColor: string
   showPuzzle: boolean // 控制是否显示拼图
+  currentBatchIndex: number // 当前批次索引
+  totalBatches: number // 总批次数
 }
 
 export interface PuzzleLayoutConfig {

@@ -392,13 +392,13 @@ export function PptPuzzleImageManager({
   }
 
   return (
-    <div className="w-80 border-l bg-background flex flex-col h-full">
-      <div className="p-4 border-b">
+    <div className="w-80 border-l bg-background flex flex-col h-screen">
+      <div className="p-4 border-b flex-shrink-0">
         <h3 className="font-semibold">图片管理</h3>
       </div>
 
-      <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "main" | "sub")} className="flex-1 flex flex-col">
-        <TabsList className="mx-4">
+      <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "main" | "sub")} className="flex-1 flex flex-col overflow-hidden">
+        <TabsList className="mx-4 flex-shrink-0">
           <TabsTrigger value="main" className="flex-1">
             主图 ({puzzleState.mainImages.length})
           </TabsTrigger>
@@ -407,7 +407,7 @@ export function PptPuzzleImageManager({
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="main" className="flex-1 flex flex-col mt-0">
+        <TabsContent value="main" className="flex-1 flex flex-col mt-0 overflow-hidden">
           <ScrollArea className="flex-1 px-4 py-2">
             <DndContext
               sensors={sensors}
@@ -442,7 +442,7 @@ export function PptPuzzleImageManager({
             </DndContext>
           </ScrollArea>
 
-          <div className="p-4 border-t">
+          <div className="p-4 border-t flex-shrink-0">
             <input
               ref={addMainFileInputRef}
               type="file"
@@ -461,7 +461,7 @@ export function PptPuzzleImageManager({
           </div>
         </TabsContent>
 
-        <TabsContent value="sub" className="flex-1 flex flex-col mt-0">
+        <TabsContent value="sub" className="flex-1 flex flex-col mt-0 overflow-hidden">
           <ScrollArea className="flex-1 px-4 py-2">
             <DndContext
               sensors={sensors}
@@ -496,7 +496,7 @@ export function PptPuzzleImageManager({
             </DndContext>
           </ScrollArea>
 
-          <div className="p-4 border-t">
+          <div className="p-4 border-t flex-shrink-0">
             <input
               ref={addSubFileInputRef}
               type="file"

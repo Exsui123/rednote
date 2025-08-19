@@ -16,6 +16,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { exportPuzzleImage } from "@/lib/utils/puzzle-exporter"
+import { exportBatchPuzzleImages } from "@/lib/utils/batch-exporter"
 
 interface ExportSectionProps {
   puzzleState: PptPuzzleState
@@ -41,8 +42,13 @@ export function ExportSection({ puzzleState }: ExportSectionProps) {
 
     setIsExporting(true)
     try {
-      await exportPuzzleImage(puzzleState, exportSettings)
-      alert("拼图导出成功！")
+      // 使用批量导出功能（会自动判断单图还是多图）
+      await exportBatchPuzzleImages(puzzleState, exportSettings)
+      if (puzzleState.totalBatches > 1) {
+        alert(`成功导出 ${puzzleState.totalBatches} 张拼图！`)
+      } else {
+        alert("拼图导出成功！")
+      }
     } catch (error) {
       console.error("导出失败:", error)
       alert("导出失败，请重试")
@@ -123,6 +129,12 @@ export function ExportSection({ puzzleState }: ExportSectionProps) {
               <span className="text-muted-foreground">次图数量:</span>
               <span className="text-blue-600">{puzzleState.subImages.length}</span>
             </div>
+            {puzzleState.totalBatches > 1 && (
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">当前页:</span>
+                <span className="text-green-600">{puzzleState.currentBatchIndex + 1} / {puzzleState.totalBatches}</span>
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>
@@ -133,7 +145,12 @@ export function ExportSection({ puzzleState }: ExportSectionProps) {
         disabled={isExporting || !canExport}
       >
         <Download className="h-4 w-4 mr-2" />
-        {isExporting ? "导出中..." : "导出拼图"}
+        {isExporting 
+          ? "导出中..." 
+          : puzzleState.totalBatches > 1 
+            ? `导出 ${puzzleState.totalBatches} 张拼图 (ZIP)`
+            : "导出拼图"
+        }
       </Button>
 
       {!canExport && puzzleState.images.length === 0 && (

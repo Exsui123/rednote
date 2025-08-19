@@ -83,9 +83,13 @@ export function LayoutSettingsSection({ puzzleState, onStateChange }: LayoutSett
   }
 
   const updateSubPerMain = (subPerMain: number) => {
+    const newTotalBatches = Math.ceil(puzzleState.mainImages.length / puzzleState.mainPerPage) || 1
+    
     onStateChange({
       ...puzzleState,
-      subPerMain
+      subPerMain,
+      totalBatches: puzzleState.showPuzzle ? newTotalBatches : puzzleState.totalBatches,
+      currentBatchIndex: Math.min(puzzleState.currentBatchIndex, newTotalBatches - 1)
     })
   }
 
@@ -97,9 +101,14 @@ export function LayoutSettingsSection({ puzzleState, onStateChange }: LayoutSett
   }
 
   const generatePuzzle = () => {
+    // 计算总批次数
+    const totalBatches = Math.ceil(puzzleState.mainImages.length / puzzleState.mainPerPage) || 1
+    
     onStateChange({
       ...puzzleState,
-      showPuzzle: true
+      showPuzzle: true,
+      currentBatchIndex: 0,  // 重置到第一页
+      totalBatches: totalBatches
     })
   }
 
@@ -131,6 +140,50 @@ export function LayoutSettingsSection({ puzzleState, onStateChange }: LayoutSett
             ))}
           </SelectContent>
         </Select>
+      </div>
+
+      {/* 每页主图数设置 */}
+      <div className="space-y-3">
+        <div className="flex items-center gap-2">
+          <Grid3X3 className="h-4 w-4" />
+          <Label className="text-sm font-medium">每页主图数</Label>
+        </div>
+        <Card className="p-4 border-dashed">
+          <div className="space-y-3">
+            <div>
+              <Label className="text-xs text-muted-foreground">每页显示多少个主图</Label>
+              <Input
+                type="number"
+                min="1"
+                max="10"
+                value={puzzleState.mainPerPage}
+                onChange={(e) => {
+                  const newMainPerPage = parseInt(e.target.value) || 4
+                  const newTotalBatches = Math.ceil(puzzleState.mainImages.length / newMainPerPage) || 1
+                  
+                  onStateChange({
+                    ...puzzleState,
+                    mainPerPage: newMainPerPage,
+                    totalBatches: puzzleState.showPuzzle ? newTotalBatches : puzzleState.totalBatches,
+                    currentBatchIndex: Math.min(puzzleState.currentBatchIndex, newTotalBatches - 1)
+                  })
+                }}
+                className="mt-1"
+              />
+            </div>
+            <div className="text-xs text-muted-foreground">
+              示例：输入 4 表示每页显示 4 个主图
+            </div>
+            
+            {puzzleState.mainImages.length > 0 && (
+              <div className="text-xs text-muted-foreground bg-muted/50 p-2 rounded">
+                当前配置：{puzzleState.mainImages.length} 个主图
+                <br />
+                将生成 {Math.ceil(puzzleState.mainImages.length / puzzleState.mainPerPage)} 页拼图
+              </div>
+            )}
+          </div>
+        </Card>
       </div>
 
       {/* 次图数量设置 */}
@@ -189,6 +242,45 @@ export function LayoutSettingsSection({ puzzleState, onStateChange }: LayoutSett
           </div>
         </Card>
       </div>
+
+      {/* 分页控件 - 只在多页时显示 */}
+      {puzzleState.totalBatches > 1 && puzzleState.showPuzzle && (
+        <div className="space-y-3">
+          <div className="flex items-center gap-2">
+            <Layout className="h-4 w-4" />
+            <Label className="text-sm font-medium">页面切换</Label>
+          </div>
+          <Card className="p-4">
+            <div className="flex items-center justify-between">
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => onStateChange({
+                  ...puzzleState,
+                  currentBatchIndex: Math.max(0, puzzleState.currentBatchIndex - 1)
+                })}
+                disabled={puzzleState.currentBatchIndex === 0}
+              >
+                上一页
+              </Button>
+              <span className="text-sm font-medium">
+                第 {puzzleState.currentBatchIndex + 1} / {puzzleState.totalBatches} 页
+              </span>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => onStateChange({
+                  ...puzzleState,
+                  currentBatchIndex: Math.min(puzzleState.totalBatches - 1, puzzleState.currentBatchIndex + 1)
+                })}
+                disabled={puzzleState.currentBatchIndex === puzzleState.totalBatches - 1}
+              >
+                下一页
+              </Button>
+            </div>
+          </Card>
+        </div>
+      )}
 
       {/* 画布尺寸 */}
       <div className="space-y-3">
