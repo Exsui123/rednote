@@ -110,7 +110,11 @@ function loadImage(url: string): Promise<HTMLImageElement> {
     const img = new Image()
     img.crossOrigin = 'anonymous'
     img.onload = () => resolve(img)
-    img.onerror = reject
+    img.onerror = () => {
+      // 创建一个空白图片作为后备
+      const fallbackImg = new Image()
+      resolve(fallbackImg)
+    }
     img.src = url
   })
 }

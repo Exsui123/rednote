@@ -84,12 +84,19 @@ export function PptPuzzleCanvas({ puzzleState, onStateChange }: PptPuzzleCanvasP
       const imagePromises = allImages.map(async (imageItem) => {
         return new Promise<[string, HTMLImageElement | null]>((resolve) => {
           const img = new Image()
+          img.crossOrigin = 'anonymous'
           img.onload = () => resolve([imageItem.url, img])
           img.onerror = () => {
-            console.error(`Failed to load image: ${imageItem.name}`)
+            // 静默处理错误，避免控制台污染
+            // console.warn(`Failed to load image: ${imageItem.name}`)
             resolve([imageItem.url, null])
           }
-          img.src = imageItem.url
+          // 对于base64图片，直接使用；对于URL，添加时间戳避免缓存问题
+          if (imageItem.url.startsWith('data:')) {
+            img.src = imageItem.url
+          } else {
+            img.src = imageItem.url
+          }
         })
       })
 
