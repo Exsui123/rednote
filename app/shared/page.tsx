@@ -146,7 +146,7 @@ function SharedPageContent() {
                     </h3>
                     {image.toolName && (
                       <p className="text-sm text-gray-500">
-                        来源: {image.toolName}
+                        来源&#58; {image.toolName}
                       </p>
                     )}
                   </div>
