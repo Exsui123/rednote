@@ -79,7 +79,7 @@ export function QrShareTool() {
       if (shareConfig.mode === 'single') {
         // 批量分享：极度压缩图片数据并编码到URL
         const imageData = await Promise.all(selectedImages.map(async img => ({
-          src: await compressImage(img.src, 0.15, 300), // 极度压缩：15%质量，300px宽度
+          src: await compressImage(img.src, 0.08, 200), // 超级压缩：8%质量，200px宽度
           fileName: img.fileName || 'image',
           toolName: img.toolName || 'tool',
         })));
@@ -111,7 +111,7 @@ export function QrShareTool() {
         
         // 检查数据大小
         if (shareUrl.length > 2500) {
-          throw new Error(`数据量过大(${shareUrl.length}字符)，请减少图片数量或使用"单独分享"模式`);
+          throw new Error(`数据量过大(${shareUrl.length}字符)，建议：\n1. 减少图片数量\n2. 使用"每张图片单独"模式\n3. 选择尺寸较小的图片`);
         }
         
         // 生成QR码
@@ -136,7 +136,7 @@ export function QrShareTool() {
         // 单独分享：每个图片一个QR码
         for (const image of selectedImages) {
           const imageData = [{
-            src: await compressImage(image.src, 0.15, 300),
+            src: await compressImage(image.src, 0.08, 200),
             fileName: image.fileName || 'image',
             toolName: image.toolName || 'tool',
           }];
