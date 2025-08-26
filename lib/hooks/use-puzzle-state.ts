@@ -50,7 +50,7 @@ export function usePuzzleState(initialState: PptPuzzleState) {
   }, [])
 
   // 保存到localStorage（防抖处理）
-  const saveTimeoutRef = useRef<NodeJS.Timeout>()
+  const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   
   const saveToStorage = useCallback((state: PptPuzzleState) => {
     if (saveTimeoutRef.current) {

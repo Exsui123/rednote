@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { ImageIcon, ArrowRight, Grid3X3, Video } from "lucide-react"
+import { ImageIcon, ArrowRight, Grid3X3, Video, Shield, QrCode } from "lucide-react"
 
 interface ToolCard {
   id: string
@@ -38,6 +38,30 @@ const tools: ToolCard[] = [
     icon: <Video className="h-8 w-8" />,
     href: "/tools/image-to-video",
     category: "视频处理"
+  },
+  {
+    id: "document-watermark",
+    title: "文档水印工具",
+    description: "为PDF和Word文档添加难以删除的水印，支持多种水印模式和防护机制",
+    icon: <Shield className="h-8 w-8" />,
+    href: "/tools/document-watermark",
+    category: "文档安全"
+  },
+  {
+    id: "smart-watermark",
+    title: "智能防护水印工具",
+    description: "多层防护技术组合，通过Canvas、SVG、CSS等多种实现方式，智能分布水印，有效对抗各类去水印工具",
+    icon: <Shield className="h-8 w-8 text-purple-600" />,
+    href: "/tools/smart-watermark",
+    category: "文档安全"
+  },
+  {
+    id: "qr-share",
+    title: "二维码分享工具",
+    description: "收集各工具生成的图片，生成二维码分享给手机端，支持批量下载和独立分享",
+    icon: <QrCode className="h-8 w-8" />,
+    href: "/tools/qr-share",
+    category: "分享工具"
   },
   // 可以在这里添加更多工具
 ]
