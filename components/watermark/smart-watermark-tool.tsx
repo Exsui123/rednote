@@ -4,7 +4,9 @@ import { useState } from 'react';
 import { ConfigPanel } from './config-panel';
 import { DocumentPreview } from './document-preview';
 import { WatermarkControlPanel } from './watermark-control-panel';
+import { FileUpload } from './file-upload';
 import { WatermarkConfig, WatermarkTechnology, ProtectionMode } from '@/lib/types/smart-watermark';
+import type { DocumentFile } from '@/lib/types/watermark';
 
 export function SmartWatermarkTool() {
   const [config, setConfig] = useState<WatermarkConfig>({
@@ -37,6 +39,7 @@ export function SmartWatermarkTool() {
     svg: true,
     css: true,
   });
+  const [files, setFiles] = useState<DocumentFile[]>([]);
 
   const handleConfigChange = (newConfig: Partial<WatermarkConfig>) => {
     setConfig(prev => ({ ...prev, ...newConfig }));
@@ -85,6 +88,16 @@ export function SmartWatermarkTool() {
       <div className="flex-1 flex overflow-hidden">
         {/* Left Column - Config Panel */}
         <div className="w-[30%] bg-white border-r overflow-y-auto">
+          <div className="p-6 border-b">
+            <div className="font-semibold text-gray-800 mb-4 flex items-center">
+              📁 文件上传
+            </div>
+            <FileUpload
+              files={files}
+              onFilesChange={setFiles}
+              maxFiles={5}
+            />
+          </div>
           <ConfigPanel 
             config={config} 
             onConfigChange={handleConfigChange} 
