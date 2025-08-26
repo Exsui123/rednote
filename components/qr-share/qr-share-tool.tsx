@@ -60,7 +60,7 @@ export function QrShareTool() {
           mockQrData.push({
             id: `qr_${image.id}`,
             qrCode: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==',
-            url: `https://share.example.com/i/${Math.random().toString(36).substr(2, 9)}`,
+            url: `${window.location.origin}/tools/qr-share?shared=${Math.random().toString(36).substr(2, 9)}`,
             imageIds: [image.id],
             expiresAt: new Date(Date.now() + getExpirationMs(shareConfig.expiresIn)),
           });
