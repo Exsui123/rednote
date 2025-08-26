@@ -9,6 +9,37 @@ import { useImageShareStore } from '@/lib/stores/image-share-store';
 import { AlertCircle } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
+// 生成唯一的分享ID
+const generateShareId = (): string => {
+  return Math.random().toString(36).substring(2) + Date.now().toString(36);
+};
+
+// 图片压缩函数
+const compressImage = (dataUrl: string, quality: number = 0.7, maxWidth: number = 800): Promise<string> => {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d')!;
+      
+      // 计算新尺寸
+      let { width, height } = img;
+      if (width > maxWidth) {
+        height = (height * maxWidth) / width;
+        width = maxWidth;
+      }
+      
+      canvas.width = width;
+      canvas.height = height;
+      
+      // 绘制并压缩
+      ctx.drawImage(img, 0, 0, width, height);
+      resolve(canvas.toDataURL('image/jpeg', quality));
+    };
+    img.src = dataUrl;
+  });
+};
+
 export interface ShareConfig {
   mode: 'single' | 'multiple'; // 单个二维码（打包）或多个二维码
   expiresIn: '1h' | '6h' | '24h' | '7d'; // 有效期
@@ -46,22 +77,37 @@ export function QrShareTool() {
       const qrData: QrCodeData[] = [];
       
       if (shareConfig.mode === 'single') {
-        // 批量分享：所有图片打包到一个QR码
-        const imageData = selectedImages.map(img => ({
-          src: img.src,
+        // 批量分享：生成一个唯一ID，通过ID访问数据
+        const shareId = generateShareId();
+        
+        // 压缩图片数据
+        const imageData = await Promise.all(selectedImages.map(async img => ({
+          src: await compressImage(img.src, 0.4, 600), // 适度压缩，保持合理质量
           fileName: img.fileName,
           toolName: img.toolName,
-        }));
+        })));
         
-        // 将图片数据编码为Base64 JSON
-        const jsonData = JSON.stringify(imageData);
-        const encodedData = btoa(jsonData);
-        const shareUrl = `${window.location.origin}/shared?data=${encodedData}`;
+        // 将数据存储到localStorage（临时方案，实际应用中应该使用服务器存储）
+        const shareData = {
+          images: imageData,
+          expiresAt: Date.now() + getExpirationMs(shareConfig.expiresIn),
+          password: shareConfig.password,
+        };
+        localStorage.setItem(`share_${shareId}`, JSON.stringify(shareData));
         
-        // 生成真实的QR码
+        // 生成简洁的分享URL
+        const shareUrl = `${window.location.origin}/shared/${shareId}`;
+        
+        // 检查URL长度，确保QR码可以生成
+        if (shareUrl.length > 2000) {
+          throw new Error('分享链接过长，无法生成二维码');
+        }
+        
+        // 生成QR码
         const qrCodeDataUrl = await QRCode.toDataURL(shareUrl, {
           width: 300,
           margin: 2,
+          errorCorrectionLevel: 'M', // 使用中等纠错级别
           color: {
             dark: '#000000',
             light: '#FFFFFF',
@@ -69,29 +115,40 @@ export function QrShareTool() {
         });
         
         qrData.push({
-          id: `qr_${Date.now()}`,
+          id: shareId,
           qrCode: qrCodeDataUrl,
           url: shareUrl,
           imageIds: selectedImages.map(img => img.id),
           expiresAt: new Date(Date.now() + getExpirationMs(shareConfig.expiresIn)),
         });
       } else {
-        // 单独分享：每个图片一个QR码
+        // 单独分享：每个图片生成独立的分享ID
         for (const image of selectedImages) {
+          const shareId = generateShareId();
+          
           const imageData = [{
-            src: image.src,
+            src: await compressImage(image.src, 0.4, 600),
             fileName: image.fileName,
             toolName: image.toolName,
           }];
           
-          const jsonData = JSON.stringify(imageData);
-          const encodedData = btoa(jsonData);
-          const shareUrl = `${window.location.origin}/shared?data=${encodedData}`;
+          const shareData = {
+            images: imageData,
+            expiresAt: Date.now() + getExpirationMs(shareConfig.expiresIn),
+            password: shareConfig.password,
+          };
+          localStorage.setItem(`share_${shareId}`, JSON.stringify(shareData));
           
-          // 生成真实的QR码
+          const shareUrl = `${window.location.origin}/shared/${shareId}`;
+          
+          if (shareUrl.length > 2000) {
+            throw new Error('分享链接过长，无法生成二维码');
+          }
+          
           const qrCodeDataUrl = await QRCode.toDataURL(shareUrl, {
             width: 300,
             margin: 2,
+            errorCorrectionLevel: 'M',
             color: {
               dark: '#000000',
               light: '#FFFFFF',
@@ -99,7 +156,7 @@ export function QrShareTool() {
           });
           
           qrData.push({
-            id: `qr_${image.id}`,
+            id: shareId,
             qrCode: qrCodeDataUrl,
             url: shareUrl,
             imageIds: [image.id],
@@ -112,7 +169,7 @@ export function QrShareTool() {
       setShowResult(true);
     } catch (error) {
       console.error('Failed to generate QR codes:', error);
-      // TODO: 显示错误提示
+      alert(`生成二维码失败: ${error instanceof Error ? error.message : '未知错误'}`);
     } finally {
       setIsGenerating(false);
     }
@@ -181,7 +238,7 @@ export function QrShareTool() {
                   生成中...
                 </>
               ) : (
-                `生成二维码${selectedImages.length > 0 ? ` &#40;${selectedImages.length}张&#41;` : ''}`
+                `生成二维码${selectedImages.length > 0 ? ` (${selectedImages.length}张)` : ''}`
               )}
             </Button>
           </div>
