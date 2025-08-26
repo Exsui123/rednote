@@ -20,15 +20,59 @@ function SharedPageContent() {
 
   useEffect(() => {
     // 从URL参数中解析图片数据
-    const data = searchParams.get('data');
+    const data = searchParams.get('data') || searchParams.get('d');
     if (data) {
       try {
-        // 解码Base64编码的JSON数据
-        const decodedData = atob(data);
-        const parsedImages = JSON.parse(decodedData);
-        setImages(parsedImages);
+        let parsedData;
+        
+        if (data.startsWith('c_')) {
+          // 压缩数据解码
+          const compressedData = data.substring(2);
+          const binaryString = atob(compressedData);
+          const bytes = new Uint8Array(binaryString.length);
+          for (let i = 0; i < binaryString.length; i++) {
+            bytes[i] = binaryString.charCodeAt(i);
+          }
+          
+          // 动态导入pako并解压
+          import('pako').then(pako => {
+            const decompressed = pako.inflate(bytes, { to: 'string' });
+            parsedData = JSON.parse(decompressed);
+            
+            // 检查过期时间
+            if (parsedData.exp && Date.now() > parsedData.exp) {
+              console.error('Share link expired');
+              setImages([]);
+            } else {
+              setImages(parsedData.images || []);
+            }
+            setLoading(false);
+          }).catch(error => {
+            console.error('Failed to decompress data:', error);
+            setLoading(false);
+          });
+          return; // 异步处理，提前返回
+        } else if (data.startsWith('b_')) {
+          // Base64数据解码
+          const base64Data = data.substring(2);
+          const decodedData = decodeURIComponent(Array.prototype.map.call(atob(base64Data), (c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
+          parsedData = JSON.parse(decodedData);
+        } else {
+          // 兼容旧格式
+          const decodedData = decodeURIComponent(Array.prototype.map.call(atob(data), (c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
+          parsedData = JSON.parse(decodedData);
+        }
+        
+        // 检查过期时间
+        if (parsedData.exp && Date.now() > parsedData.exp) {
+          console.error('Share link expired');
+          setImages([]);
+        } else {
+          setImages(parsedData.images || parsedData || []);
+        }
       } catch (error) {
         console.error('Failed to parse image data:', error);
+        setImages([]);
       }
     }
     setLoading(false);
