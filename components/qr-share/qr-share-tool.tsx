@@ -109,7 +109,7 @@ export function QrShareTool() {
         <Alert>
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
-            暂无待分享的图片。从其他工具发送图片到这里，或点击"添加本地图片"上传。
+            暂无待分享的图片。从其他工具发送图片到这里，或点击&ldquo;添加本地图片&rdquo;上传。
           </AlertDescription>
         </Alert>
       )}
