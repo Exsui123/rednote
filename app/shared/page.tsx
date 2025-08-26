@@ -106,7 +106,7 @@ function SharedPageContent() {
         <div className="max-w-4xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <h1 className="text-xl font-semibold text-gray-800">
-              分享的图片 ({images.length})
+              分享的图片 &#40;{images.length}&#41;
             </h1>
             <Button 
               onClick={() => window.history.back()}
