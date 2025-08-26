@@ -50,7 +50,7 @@ export function QrShareTool() {
         mockQrData.push({
           id: `qr_${Date.now()}`,
           qrCode: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==',
-          url: `https://share.example.com/s/${Math.random().toString(36).substr(2, 9)}`,
+          url: `${window.location.origin}/tools/qr-share?batch=${Math.random().toString(36).substr(2, 9)}`,
           imageIds: selectedImages.map(img => img.id),
           expiresAt: new Date(Date.now() + getExpirationMs(shareConfig.expiresIn)),
         });
