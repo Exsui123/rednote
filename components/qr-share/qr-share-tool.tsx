@@ -181,7 +181,7 @@ export function QrShareTool() {
                   生成中...
                 </>
               ) : (
-                `生成二维码${selectedImages.length > 0 ? ` (${selectedImages.length}张)` : ''}`
+                `生成二维码${selectedImages.length > 0 ? ` &#40;${selectedImages.length}张&#41;` : ''}`
               )}
             </Button>
           </div>
