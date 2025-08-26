@@ -79,9 +79,9 @@ export function QrShareTool() {
       if (shareConfig.mode === 'single') {
         // 批量分享：极度压缩图片数据并编码到URL
         const imageData = await Promise.all(selectedImages.map(async img => ({
-          src: await compressImage(img.src, 0.05, 150), // 极限压缩：5%质量，150px宽度
-          fileName: img.fileName || 'image',
-          toolName: img.toolName || 'tool',
+          src: await compressImage(img.src, 0.03, 120), // 终极压缩：3%质量，120px宽度
+          fileName: (img.fileName || 'image').substring(0, 10), // 限制文件名长度
+          toolName: (img.toolName || 'tool').substring(0, 8), // 限制工具名长度
         })));
         
         // 尝试生成分享数据
@@ -116,9 +116,11 @@ export function QrShareTool() {
         
         // 生成QR码
         const qrCodeDataUrl = await QRCode.toDataURL(shareUrl, {
-          width: 300,
-          margin: 1, // 减小边距
-          errorCorrectionLevel: 'L', // 使用最低纠错级别节省空间
+          width: 400, // 增大尺寸便于扫描
+          margin: 2, // 适当边距
+          errorCorrectionLevel: 'L', // 最低纠错级别
+          type: 'image/png',
+          quality: 1.0,
           color: {
             dark: '#000000',
             light: '#FFFFFF',
@@ -136,9 +138,9 @@ export function QrShareTool() {
         // 单独分享：每个图片一个QR码
         for (const image of selectedImages) {
           const imageData = [{
-            src: await compressImage(image.src, 0.05, 150),
-            fileName: image.fileName || 'image',
-            toolName: image.toolName || 'tool',
+            src: await compressImage(image.src, 0.03, 120),
+            fileName: (image.fileName || 'image').substring(0, 10),
+            toolName: (image.toolName || 'tool').substring(0, 8),
           }];
           
           const shareData = {
@@ -167,9 +169,11 @@ export function QrShareTool() {
           }
           
           const qrCodeDataUrl = await QRCode.toDataURL(shareUrl, {
-            width: 300,
-            margin: 1,
+            width: 400,
+            margin: 2,
             errorCorrectionLevel: 'L',
+            type: 'image/png',
+            quality: 1.0,
             color: {
               dark: '#000000',
               light: '#FFFFFF',
