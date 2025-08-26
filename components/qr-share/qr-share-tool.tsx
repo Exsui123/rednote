@@ -40,37 +40,82 @@ export function QrShareTool() {
 
     setIsGenerating(true);
     
-    // Simulate QR code generation (will be replaced with actual API call later)
-    setTimeout(() => {
-      // Mock QR code data
-      const mockQrData: QrCodeData[] = [];
+    try {
+      // 动态导入QRCode库
+      const QRCode = (await import('qrcode')).default;
+      const qrData: QrCodeData[] = [];
       
       if (shareConfig.mode === 'single') {
-        // Generate single QR code for all images
-        mockQrData.push({
+        // 批量分享：所有图片打包到一个QR码
+        const imageData = selectedImages.map(img => ({
+          src: img.src,
+          fileName: img.fileName,
+          toolName: img.toolName,
+        }));
+        
+        // 将图片数据编码为Base64 JSON
+        const jsonData = JSON.stringify(imageData);
+        const encodedData = btoa(jsonData);
+        const shareUrl = `${window.location.origin}/shared?data=${encodedData}`;
+        
+        // 生成真实的QR码
+        const qrCodeDataUrl = await QRCode.toDataURL(shareUrl, {
+          width: 300,
+          margin: 2,
+          color: {
+            dark: '#000000',
+            light: '#FFFFFF',
+          },
+        });
+        
+        qrData.push({
           id: `qr_${Date.now()}`,
-          qrCode: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==',
-          url: `${window.location.origin}/tools/qr-share?batch=${Math.random().toString(36).substr(2, 9)}`,
+          qrCode: qrCodeDataUrl,
+          url: shareUrl,
           imageIds: selectedImages.map(img => img.id),
           expiresAt: new Date(Date.now() + getExpirationMs(shareConfig.expiresIn)),
         });
       } else {
-        // Generate individual QR codes for each image
-        selectedImages.forEach((image) => {
-          mockQrData.push({
+        // 单独分享：每个图片一个QR码
+        for (const image of selectedImages) {
+          const imageData = [{
+            src: image.src,
+            fileName: image.fileName,
+            toolName: image.toolName,
+          }];
+          
+          const jsonData = JSON.stringify(imageData);
+          const encodedData = btoa(jsonData);
+          const shareUrl = `${window.location.origin}/shared?data=${encodedData}`;
+          
+          // 生成真实的QR码
+          const qrCodeDataUrl = await QRCode.toDataURL(shareUrl, {
+            width: 300,
+            margin: 2,
+            color: {
+              dark: '#000000',
+              light: '#FFFFFF',
+            },
+          });
+          
+          qrData.push({
             id: `qr_${image.id}`,
-            qrCode: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==',
-            url: `${window.location.origin}/tools/qr-share?shared=${Math.random().toString(36).substr(2, 9)}`,
+            qrCode: qrCodeDataUrl,
+            url: shareUrl,
             imageIds: [image.id],
             expiresAt: new Date(Date.now() + getExpirationMs(shareConfig.expiresIn)),
           });
-        });
+        }
       }
       
-      setQrCodeData(mockQrData);
+      setQrCodeData(qrData);
       setShowResult(true);
+    } catch (error) {
+      console.error('Failed to generate QR codes:', error);
+      // TODO: 显示错误提示
+    } finally {
       setIsGenerating(false);
-    }, 1500);
+    }
   }, [selectedImages, shareConfig]);
 
   const getExpirationMs = (expiresIn: string): number => {
